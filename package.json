@@ -1,0 +1,26 @@
+{
+  "name": "node-escpos-addon",
+  "version": "1.0.11",
+  "description": "a cpp escpos plugin for electron",
+  "main": "./index.js",
+  "scripts": {
+    "test": "node test.js",
+    "build-addon": "node-gyp rebuild",
+    "build-addon-debug": "node-gyp rebuild --debug",
+    "build-addon-electron": "node-gyp  rebuild --target=1.7.9 --arch=ia32 --dist-url=https://atom.io/download/electron",
+    "config": "node-gyp configure --nodedir=\"F:node/Debug\""
+  },
+  "keywords": [
+    "a",
+    "cpp",
+    "escpos",
+    "plugin",
+    "for",
+    "nodjes"
+  ],
+  "author": "vidy",
+  "license": "ISC",
+  "dependencies": {
+    "nan": "^2.10.0"
+  }
+}
