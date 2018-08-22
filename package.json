@@ -1,6 +1,6 @@
 {
   "name": "node-escpos-addon",
-  "version": "1.0.11",
+  "version": "1.0.117",
   "description": "a cpp escpos plugin for electron",
   "main": "./index.js",
   "scripts": {
@@ -21,6 +21,11 @@
   "author": "vidy",
   "license": "ISC",
   "dependencies": {
+    "iconv-lite": "^0.4.23",
     "nan": "^2.10.0"
+  },
+  "repository": {
+    "type": "github",
+    "url": "https://github.com/boneVidy/node-escpos-addon"
   }
 }
