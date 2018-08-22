@@ -4,7 +4,7 @@ const win32Escpos = function () {
       return {
         GetUsbDeviceList,
         PrintRaw (path, gbkBf) {
-
+          return PrintRaw(path, gbkBf);
         }
       }
      }
