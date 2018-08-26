@@ -29,7 +29,9 @@ class PrintDevice
 
 //设备数量上限，假设16台上限
 #define MAX_DEVICE 16
-__declspec(dllexport)  int PrintRawData(string devicePath, const string & meg);
+int PrintRawData(string devicePath, char*  meg, size_t size);
+int PrintRawData(string devicePath, char*  meg);
 int WriteRawData(const char * str, HANDLE hPort);
+int WriteRawData(const char * str, HANDLE hPort, size_t size);
 HANDLE InitPort(PrintDevice &device);
 void InitializeDevicePar(PrintDevice &device);

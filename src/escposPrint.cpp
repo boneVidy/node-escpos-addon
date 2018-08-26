@@ -8,7 +8,14 @@
 
    return WriteFile(hPort, str, (DWORD)strlen(str), &dwWrite, NULL);
  }
- int PrintRawData(string devicePath, const string & meg)
+ int WriteRawData(const char * str, HANDLE hPort, size_t size)
+ {
+   DWORD dwWrite;
+
+   return WriteFile(hPort, str, (DWORD)size, &dwWrite, NULL);
+ }
+
+ int PrintRawData(string devicePath, char*  meg)
  {
    // string endstr = "\x1D\x56\x41\x00";
    PrintDevice device;
@@ -16,9 +23,18 @@
    device.Port = devicePath;
    HANDLE handle = InitPort(device);
    
-   return WriteRawData(meg.c_str(), handle);
+   return WriteRawData(meg, handle);
  }
+ int PrintRawData(string devicePath, char*  meg, size_t size)
+ {
+   // string endstr = "\x1D\x56\x41\x00";
+   PrintDevice device;
+   InitializeDevicePar(device);
+   device.Port = devicePath;
+   HANDLE handle = InitPort(device);
 
+   return WriteRawData(meg, handle, size);
+ }
  void InitializeDevicePar(PrintDevice &device)
  {
    device.Port = "COM4";

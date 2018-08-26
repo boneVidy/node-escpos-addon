@@ -1,15 +1,13 @@
 const win32Escpos = function () {
-    if (process.platform === 'win32') {
-      const {GetUsbDeviceList, PrintRaw} = require('./build/Release/addon.node');
-      return {
-        GetUsbDeviceList,
-        PrintRaw (path, gbkBf) {
-          return PrintRaw(path, gbkBf);
-        }
-      }
-     }
-     
-     throw new Error("must be win32 platform to use");
+  if (process.platform === 'win32') {
+    const {GetUsbDeviceList, PrintRaw} = require('./build/Debug/addon.node');
+    return {
+      GetUsbDeviceList,
+      PrintRaw 
+    }
+   }
+   
+   throw new Error("must be win32 platform to use");
 }
 
 
