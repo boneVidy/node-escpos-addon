@@ -1,6 +1,6 @@
 const win32Escpos = function () {
   if (process.platform === 'win32') {
-    const {GetUsbDeviceList, PrintRaw} = require('./build/Debug/addon.node');
+    const {GetUsbDeviceList, PrintRaw} = require('./build/Release/addon.node');
     return {
       GetUsbDeviceList,
       PrintRaw 
