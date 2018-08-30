@@ -1,21 +1,23 @@
  #include "escposPrint.h"
+#include <process.h>
  using namespace std;
+ 
  //USB类的GUID
  const GUID USB_GUID = { 0xa5dcbf10, 0x6530, 0x11d2,{ 0x90, 0x1f, 0x00, 0xc0, 0x4f, 0xb9, 0x51, 0xed } };
- int WriteRawData(const char * str, HANDLE hPort)
+ BOOL WriteRawData(const char * str, HANDLE hPort)
  {
    DWORD dwWrite;
 
    return WriteFile(hPort, str, (DWORD)strlen(str), &dwWrite, NULL);
  }
- int WriteRawData(const char * str, HANDLE hPort, size_t size)
+ BOOL WriteRawData(const char * str, HANDLE hPort, size_t size)
  {
    DWORD dwWrite;
 
    return WriteFile(hPort, str, (DWORD)size, &dwWrite, NULL);
  }
-
- int PrintRawData(string devicePath, char*  meg)
+ 
+ BOOL PrintRawData(string devicePath, char*  meg)
  {
    // string endstr = "\x1D\x56\x41\x00";
    PrintDevice device;
@@ -33,7 +35,11 @@
    device.Port = devicePath;
    HANDLE handle = InitPort(device);
 
-   return WriteRawData(meg, handle, size);
+    int r = WriteRawData(meg, handle, size);
+	printf("write file result is %d", r);
+	int err = GetLastError();
+	printf("getlast err is %d", err);
+	return 0;
  }
  void InitializeDevicePar(PrintDevice &device)
  {
@@ -102,8 +108,13 @@
      DWORD iBytesLength;
      const char* chInitCode = "\x0D\x1B\x40";
      WriteFile(handle, chInitCode, (DWORD)3L, &iBytesLength, NULL);
-     if (!WriteFile(handle, chInitCode, (DWORD)3L, &iBytesLength, NULL))
-       return false;
+	 if (!WriteFile(handle, chInitCode, (DWORD)3L, &iBytesLength, NULL))
+	 {
+		 cout << "last err is " << GetLastError() << endl;
+		 return false;
+
+	 }
+
    }
 
    return handle;
