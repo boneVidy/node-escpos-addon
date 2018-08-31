@@ -39,6 +39,7 @@
 	printf("write file result is %d", r);
 	int err = GetLastError();
 	printf("getlast err is %d", err);
+	CloseHandle(handle);
 	return 0;
  }
  void InitializeDevicePar(PrintDevice &device)
