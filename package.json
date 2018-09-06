@@ -1,6 +1,6 @@
 {
   "name": "node-escpos-addon",
-  "version": "1.0.124",
+  "version": "1.0.125",
   "description": "a cpp escpos plugin for electron",
   "main": "./index.js",
   "scripts": {
