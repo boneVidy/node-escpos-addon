@@ -4,6 +4,7 @@
 #include "escposPrint.h"
 #include <list>
 #include <regex>
+#include "index.h"
 using namespace std;
 using v8::FunctionCallbackInfo;
 using v8::Isolate;
@@ -63,15 +64,49 @@ void GetUsbDeviceList(const FunctionCallbackInfo<Value>& args)
 {
 	Isolate* isolate = args.GetIsolate();
 	list<DeviceInfo>  deviceList;
-	GetDeviceList(deviceList);
+	// int argsLength = 
+	if (args.Length() >= 1)
+	{
+
+		Local<String> deviceType = args[0]->ToString();
+		int len = deviceType->Length();
+
+
+		bool mallocFailed;
+
+		char * deviceTypeBuffer = (char *)malloc(len + 1);
+		if (deviceTypeBuffer == nullptr) {
+			return;
+		}
+		deviceType->WriteUtf8(deviceTypeBuffer, len);
+		deviceTypeBuffer[deviceType->Utf8Length()] = 0;
+		mallocFailed = false;
+		if (mallocFailed) return;
+		
+		if (!strcmp(deviceTypeBuffer, "usb")) {
+			GetDeviceList(deviceList, (GUID)USB_GUID);
+			free(deviceTypeBuffer);
+		}
+		else if (!strcmp(deviceTypeBuffer, "com/lpt")) {
+			GetDeviceList(deviceList, (GUID)GUID_CLASS_COMPORT);
+			free(deviceTypeBuffer);
+		}
+		else {
+			isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, "Wrong type, must be usb or com/lpt")));
+			free(deviceTypeBuffer);
+			return;
+		}
+	}
+	else if (args.Length() == 0) {
+		GetDeviceList(deviceList, (GUID)USB_GUID);
+	}
+
 	list<DeviceInfo>::iterator itor = deviceList.begin();
 	Local<Array> resultArr = Array::New(isolate, deviceList.size());
 	int count = 0;
 	while (itor != deviceList.end())
 	{
-
 		Local<Object> info = Object::New(isolate);
-
 		Local<String> pathKey = String::NewFromUtf8(isolate, "path");
 		Local<String> pathValue = String::NewFromUtf8(isolate, (itor)->path.c_str());
 		info->Set(pathKey, pathValue);
@@ -83,6 +118,19 @@ void GetUsbDeviceList(const FunctionCallbackInfo<Value>& args)
 		itor++;
 	}
 	args.GetReturnValue().Set(resultArr);
+
+}
+void parseFromV8String(v8::Local<v8::String> &deviceType, char* deviceTypeBuffer, bool &retflag)
+{
+	retflag = true;
+	int len = deviceType->Utf8Length();
+	deviceTypeBuffer = (char *)malloc(len + 1);
+	if (deviceTypeBuffer == nullptr) {
+		return;
+	}
+	deviceType->WriteUtf8(deviceTypeBuffer, len);
+	deviceTypeBuffer[deviceType->Utf8Length()] = 0;
+	retflag = false;
 }
 void PrintRaw(const FunctionCallbackInfo<Value>& args)
 {
@@ -119,7 +167,7 @@ void PrintRaw(const FunctionCallbackInfo<Value>& args)
 	string sDevice(deviceBf);
 	regex reg1("^LPT\\d+");
 	smatch r2;
-	PrintResult * printResult = (PrintResult *) malloc(sizeof(PrintResult));
+	PrintResult * printResult = (PrintResult *)malloc(sizeof(PrintResult));
 	if (regex_match(sDevice, r2, reg1))
 	{
 		PrintRawDataByLpt(deviceBf, bfData, bufferLength, printResult);

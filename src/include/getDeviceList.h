@@ -23,4 +23,4 @@ struct DeviceInfo
 };
 // 
 // typedef list<DeviceInfo> DeviceInfoList;
-void GetDeviceList(list<DeviceInfo> &devicelist);
+void GetDeviceList(list<DeviceInfo> &devicelist, GUID guid );

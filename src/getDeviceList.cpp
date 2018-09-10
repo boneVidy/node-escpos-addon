@@ -1,8 +1,10 @@
 #include "getDeviceList.h"
+#include <devguid.h>
 using namespace std;
 
 
 const GUID USB_GUID = { 0xa5dcbf10, 0x6530, 0x11d2,{ 0x90, 0x1f, 0x00, 0xc0, 0x4f, 0xb9, 0x51, 0xed } };
+
 typedef BOOL (WINAPI *FN_SetupDiGetDevicePropertyW)(
   __in       HDEVINFO DeviceInfoSet,
   __in       PSP_DEVINFO_DATA DeviceInfoData,
@@ -24,9 +26,11 @@ string Unicode2Utf8(const wchar_t* unicode)
   free(szUtf8);
   return res;
 }
-void GetDeviceList(list<DeviceInfo> &devicelist)
+void GetDeviceList(list<DeviceInfo> &devicelist, GUID guid )
 {
-  const LPGUID lpGuid = (LPGUID)&USB_GUID;
+  //const LPGUID lpGuid = (LPGUID)&USB_GUID;
+  const LPGUID lpGuid = (LPGUID)&guid;
+
   HDEVINFO hDevInfoSet;
   SP_DEVINFO_DATA spDevInfoData;
   SP_DEVICE_INTERFACE_DATA ifData;
@@ -54,8 +58,6 @@ void GetDeviceList(list<DeviceInfo> &devicelist)
   nTotle = -1;
   nCount = 0;
   bResult = TRUE;
-  printf_s("pdetail pointer is %p\n", pDetail);
-  printf_s("pdetail cbsize is %d\n", pDetail->cbSize);
   // 设备序号=0,1,2... 逐一测试设备接口，到失败为止
   while (bResult)
   {
@@ -76,24 +78,15 @@ void GetDeviceList(list<DeviceInfo> &devicelist)
       char nameBuf[MAX_PATH];
       DWORD nSize = 0;
       // SPDRP_SERVICE  DEVPKEY_Device_BusReportedDeviceDesc
-      if (SetupDiGetDevicePropertyW(hDevInfoSet, &spDevInfoData,
+      if (!SetupDiGetDevicePropertyW(hDevInfoSet, &spDevInfoData,
         &DEVPKEY_Device_BusReportedDeviceDesc, &DataT, (PBYTE)nameBuf, sizeof(nameBuf), &nSize, 0))
       {
-
+		  lstrcpy(nameBuf, _T("Unknown"));
       }
-      else
-      {
-        lstrcpy(nameBuf, _T("Unknown"));
-      }
-
-      if (SetupDiGetDeviceRegistryProperty(hDevInfoSet, &spDevInfoData,
+      if (!SetupDiGetDeviceRegistryProperty(hDevInfoSet, &spDevInfoData,
         SPDRP_SERVICE, &DataT, (PBYTE)serviceBuf, sizeof(serviceBuf), &nSize))
       {
-
-      }
-      else
-      {
-        lstrcpy(serviceBuf, _T("Unknown"));
+		  lstrcpy(serviceBuf, _T("Unknown"));
       }
       // get Friendly Name or Device Description
       if (SetupDiGetDeviceRegistryProperty(hDevInfoSet, &spDevInfoData,
