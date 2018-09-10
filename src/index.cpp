@@ -1,16 +1,10 @@
-// hello.cc
 #include <nan.h>
 #include <Windows.h>
-#include <process.h>
-//#include "escpos.h"
 #include "getDeviceList.h"
 #include "escposPrint.h"
-//#include "base64.h"
 #include <list>
-#include <queue>
-#include <mutex>
+#include <regex>
 using namespace std;
-// #pragma comment(lib, "ConsoleApplication1.lib")
 using v8::FunctionCallbackInfo;
 using v8::Isolate;
 using v8::Local;
@@ -20,10 +14,8 @@ using v8::Value;
 using v8::Array;
 using v8::Exception;
 using v8::ArrayBuffer;
-
-
-
-
+using v8::Boolean;
+using v8::Number;
 string Utf8ToGbk(const std::string& strUtf8)//传入的strUtf8是UTF-8编码
 {
 	//UTF-8转unicode
@@ -94,16 +86,12 @@ void GetUsbDeviceList(const FunctionCallbackInfo<Value>& args)
 }
 void PrintRaw(const FunctionCallbackInfo<Value>& args)
 {
-	printf(".....................................................");
-
 	Isolate* isolate = args.GetIsolate();
 	if (args.Length() < 2)
 	{
 		isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, "Wrong number of arguments, must be 2")));
 		return;
 	}
-
-
 	if (!args[0]->IsString())
 	{
 		isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "the first argument must be a string")));
@@ -115,8 +103,6 @@ void PrintRaw(const FunctionCallbackInfo<Value>& args)
 		isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "the second argument must be a buffer")));
 		return;
 	}
-
-
 	Local<String> devicePath = args[0]->ToString();
 	// Local<String> raw = args[1]->ToString();
 	Local<Object> bufferObj = args[1]->ToObject();
@@ -130,22 +116,22 @@ void PrintRaw(const FunctionCallbackInfo<Value>& args)
 
 	devicePath->WriteUtf8(deviceBf, devicePath->Utf8Length());
 	deviceBf[devicePath->Utf8Length()] = 0;
-	PrintRawData(deviceBf, bfData, bufferLength);
-	//  if (printThread == -1) {
-	//	 _beginthreadex(NULL, 0, (_beginthreadex_proc_type)printLoop, NULL, 0, &printThread);
-	//
-	//	 // PrintRawData(deviceBf, bfData, bufferLength);
-	//  }
-	//
-	//  PrintMsg *pMsg = new PrintMsg;
-	//  pMsg->bfData = bfData;
-	//  pMsg->bufferLength = bufferLength;
-	//  pMsg->deviceBf = deviceBf;
-	//  WaitForSingleObject(hMutex, INFINITE);
-	//  q.push(pMsg);
-	//  ReleaseMutex(hMutex);
-
-
+	string sDevice(deviceBf);
+	regex reg1("^LPT\\d+");
+	smatch r2;
+	PrintResult * printResult = (PrintResult *) malloc(sizeof(PrintResult));
+	if (regex_match(sDevice, r2, reg1))
+	{
+		PrintRawDataByLpt(deviceBf, bfData, bufferLength, printResult);
+	}
+	else {
+		PrintRawData(deviceBf, bfData, bufferLength, printResult);
+	}
+	Local<Object> ret = Object::New(isolate);
+	ret->Set(String::NewFromUtf8(isolate, "success"), Boolean::New(isolate, printResult->success));
+	ret->Set(String::NewFromUtf8(isolate, "err"), Number::New(isolate, printResult->err));
+	args.GetReturnValue().Set(ret);
+	free(printResult);
 	free(deviceBf);
 }
 void Initialize(Local<Object> exports) {
