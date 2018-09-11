@@ -4,8 +4,8 @@ export interface EscposPrinter  {
     path: string;
     service: string | 'usbprint' | 'usbccgp' | 'libusb0' |'winusb';
 }
-
-export function GetUsbDeviceList   (): EscposPrinter[];
+export type DeviceType = 'usb' |'com/lpt'
+export function GetUsbDeviceList   (type?: DeviceType): EscposPrinter[];
 export function PrintRaw  (path: string, rowBf: Buffer): void
 
 
