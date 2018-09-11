@@ -8,7 +8,7 @@
     "build-addon": "node-gyp rebuild",
     "build-addon-debug": "node-gyp rebuild --debug",
     "build-addon-electron": "node-gyp  rebuild --target=1.7.9 --arch=ia32 --dist-url=https://atom.io/download/electron",
-    "config": "node-gyp configure --nodedir=\"F:node/Debug\""
+    "config": "node-gyp configure --nodedir=\"F:\\node\""
   },
   "keywords": [
     "a",
