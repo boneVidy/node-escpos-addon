@@ -2,10 +2,24 @@ export interface EscposPrinter  {
     name: string;
     desc: string;
     path: string;
-    service: string | 'usbprint' | 'usbccgp' | 'libusb0' |'winusb';
+    service: string | 'usbprint' | 'usbccgp' | 'libusb0' |'winusb' | "Unknown";
 }
-export type DeviceType = 'usb' |'com/lpt'
-export function GetUsbDeviceList   (type?: DeviceType): EscposPrinter[];
-export function PrintRaw  (path: string, rowBf: Buffer): void
+export type PrintResult  = {
+    success: boolean;
+    /*err is  c/c++ GetLastError()'s result;*/
+    err: number
+};
+export type DeviceType = 'USB' |'LPT'
+export function GetUsbDeviceList (): EscposPrinter[];
+export function GetLptDeviceList(): EscposPrinter[];
+export function GetDeviceList(type?:DeviceType): EscposPrinter[];
+/**
+ * 
+ * @param {string} path 
+ * @param {Buffer} rowBf 
+ * @returns {PrintResult}
+ * @description ;
+ */
+export function PrintRaw  (path: EscposPrinter['path'], rowBf: Buffer): PrintResult
 
 
