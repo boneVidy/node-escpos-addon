@@ -28,6 +28,7 @@ string Unicode2Utf8(const wchar_t* unicode)
 }
 void GetDeviceList(list<DeviceInfo> &devicelist, GUID guid )
 {
+
   //const LPGUID lpGuid = (LPGUID)&USB_GUID;
   const LPGUID lpGuid = (LPGUID)&guid;
 
@@ -61,7 +62,7 @@ void GetDeviceList(list<DeviceInfo> &devicelist, GUID guid )
   // 设备序号=0,1,2... 逐一测试设备接口，到失败为止
   while (bResult)
   {
-    nTotle++;
+    nTotle++;             
     spDevInfoData.cbSize = sizeof(SP_DEVINFO_DATA);
 
     // 枚举符合该GUID的设备接口
@@ -69,8 +70,7 @@ void GetDeviceList(list<DeviceInfo> &devicelist, GUID guid )
       hDevInfoSet,     // 设备信息集句柄
       (ULONG)nTotle,   // 设备信息集里的设备序号
       &spDevInfoData);        // 设备接口信息
-
-    if (bResult)
+	if (bResult)
     {
       DWORD DataT;
       char buf[MAX_PATH];
@@ -99,9 +99,6 @@ void GetDeviceList(list<DeviceInfo> &devicelist, GUID guid )
         lstrcpy(buf, _T("Unknown"));
       }
 
-      //是否是要找的设备类型
-      //if (strcmp(buf, _T("USB 打印支持")) != 0)
-      //continue;
 
       ifData.cbSize = sizeof(ifData);
 
@@ -134,7 +131,11 @@ void GetDeviceList(list<DeviceInfo> &devicelist, GUID guid )
           nCount++;
         }
       }
-    }
+	}
+	else {
+		DWORD err = GetLastError();
+		printf("enum devices failed %d, count is %d", err, nTotle);
+	}
   }
 
   // 释放设备接口数据空间

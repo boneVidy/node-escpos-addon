@@ -5,6 +5,10 @@
 #include <list>
 #include <regex>
 #include "index.h"
+#include <devguid.h>
+#include <setupapi.h>
+#include <Usbiodef.h>
+#include <Ntddpar.h>
 using namespace std;
 using v8::FunctionCallbackInfo;
 using v8::Isolate;
@@ -60,7 +64,7 @@ string GbkToUtf8(const std::string& strGbk)//传入的strGbk是GBK编码
 	return strTemp;
 }
 
-void GetUsbDeviceList(const FunctionCallbackInfo<Value>& args)
+void GetDeviceList(const FunctionCallbackInfo<Value>& args)
 {
 	Isolate* isolate = args.GetIsolate();
 	list<DeviceInfo>  deviceList;
@@ -83,22 +87,30 @@ void GetUsbDeviceList(const FunctionCallbackInfo<Value>& args)
 		mallocFailed = false;
 		if (mallocFailed) return;
 		
-		if (!strcmp(deviceTypeBuffer, "usb")) {
-			GetDeviceList(deviceList, (GUID)USB_GUID);
+		if (!strcmp(deviceTypeBuffer, "USB")) {
+			GetDeviceList(deviceList, GUID_DEVINTERFACE_USB_DEVICE);
 			free(deviceTypeBuffer);
 		}
-		else if (!strcmp(deviceTypeBuffer, "com/lpt")) {
-			GetDeviceList(deviceList, (GUID)GUID_CLASS_COMPORT);
+		else if(!strcmp(deviceTypeBuffer, "LPT")) {
+			GUID guid;
+			GUID *guidP;
+			DWORD i = sizeof(GUID);
+			guidP = &guid;
+			// GUID_DEVINTERFACE_KEYBOARD
+			if (SetupDiClassGuidsFromName(deviceTypeBuffer, guidP, i, &i)) {
+				GetDeviceList(deviceList, GUID_DEVINTERFACE_PARCLASS);
+			}
 			free(deviceTypeBuffer);
 		}
 		else {
-			isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, "Wrong type, must be usb or com/lpt")));
+			isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, "Wrong type, must be Usb or Ports")));
 			free(deviceTypeBuffer);
 			return;
 		}
+		
 	}
 	else if (args.Length() == 0) {
-		GetDeviceList(deviceList, (GUID)USB_GUID);
+		GetDeviceList(deviceList, GUID_DEVINTERFACE_USB_DEVICE);
 	}
 
 	list<DeviceInfo>::iterator itor = deviceList.begin();
@@ -184,7 +196,7 @@ void PrintRaw(const FunctionCallbackInfo<Value>& args)
 }
 void Initialize(Local<Object> exports) {
 	// NODE_SET_METHOD(exports, "Print", Print);
-	NODE_SET_METHOD(exports, "GetUsbDeviceList", GetUsbDeviceList);
+	NODE_SET_METHOD(exports, "GetDeviceList", GetDeviceList);
 	NODE_SET_METHOD(exports, "PrintRaw", PrintRaw);
 }
 
