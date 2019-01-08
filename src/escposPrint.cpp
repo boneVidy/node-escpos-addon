@@ -24,6 +24,7 @@ BOOL PrintRawDataByLpt(string devicePath, char*  meg, size_t size, PrintResult *
 		return FALSE;
 	}
 	FlushFileBuffers(hLPT);
+	CloseHandle(hLPT);
 	SetPrintResult(result, TRUE, NULL);
 	return TRUE;
 }
@@ -47,7 +48,7 @@ BOOL PrintRawData(string devicePath, char*  meg, size_t size, PrintResult *resul
 	int err = GetLastError();
 	printf("getlast err is %d", err);
 	CloseHandle(handle);
-	SetPrintResult(result, TRUE, NULL);
+	SetPrintResult(result, TRUE, err);
 	return TRUE;
 }
 
