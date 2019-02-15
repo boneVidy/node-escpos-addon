@@ -1,6 +1,6 @@
 {
   "name": "node-escpos-addon",
-  "version": "1.0.128",
+  "version": "1.0.129",
   "description": "a cpp escpos plugin for nodejs and electron",
   "main": "./index.js",
   "scripts": {
@@ -11,12 +11,12 @@
     "config": "node-gyp configure --nodedir=\"F:\\node\""
   },
   "keywords": [
-    "a",
+    "windows",
     "cpp",
     "escpos",
-    "plugin",
-    "for",
-    "nodjes"
+    "addon",
+    "electron",
+    "nodejs"
   ],
   "author": "vidy",
   "license": "ISC",

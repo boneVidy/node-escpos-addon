@@ -9,9 +9,10 @@ export type PrintResult  = {
     /*err is  c/c++ GetLastError()'s result;*/
     err: number
 };
-export type DeviceType = 'USB' |'LPT'
+export type DeviceType = 'USB' |'LPT' | 'COM'
 export function GetUsbDeviceList (): EscposPrinter[];
 export function GetLptDeviceList(): EscposPrinter[];
+export function GetComDeviceList(): EscposPrinter[];
 export function GetDeviceList(type?:DeviceType): EscposPrinter[];
 /**
  * 

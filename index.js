@@ -5,6 +5,9 @@ const win32Escpos = function () {
       GetUsbDeviceList () {
         return GetDeviceList('USB');
       },
+      GetComDeviceList() {
+        return GetDeviceList('COM');
+      },
       GetLptDeviceList () {
         return GetDeviceList('LPT').map((item, index) => {
           const matchs = item.path.match(/lpt\d/);

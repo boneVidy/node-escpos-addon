@@ -96,9 +96,19 @@ void GetDeviceList(const FunctionCallbackInfo<Value>& args)
 			GUID *guidP;
 			DWORD i = sizeof(GUID);
 			guidP = &guid;
-			// GUID_DEVINTERFACE_KEYBOARD
 			if (SetupDiClassGuidsFromName(deviceTypeBuffer, guidP, i, &i)) {
 				GetDeviceList(deviceList, GUID_DEVINTERFACE_PARCLASS);
+			}
+			free(deviceTypeBuffer);
+		}
+		else if (!strcmp(deviceTypeBuffer, "COM")) {
+			GUID guid;
+			GUID *guidP;
+			DWORD i = sizeof(GUID);
+			guidP = &guid;
+			// GUID_DEVINTERFACE_KEYBOARD
+			if (SetupDiClassGuidsFromName(deviceTypeBuffer, guidP, i, &i)) {
+				GetDeviceList(deviceList, GUID_DEVINTERFACE_COMPORT);
 			}
 			free(deviceTypeBuffer);
 		}
