@@ -1,4 +1,5 @@
-escpos native plugin for electron
+#escpos native plugin for electron
+#目前只支持 windows系统
 ```js
 // usb printer
 const iconv = require('iconv-lite');
