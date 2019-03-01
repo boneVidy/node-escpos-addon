@@ -1,6 +1,6 @@
 const win32Escpos = function () {
   if (process.platform === 'win32') {
-    const {GetDeviceList, PrintRaw} = require('./build/Release/addon.node');
+    const {GetDeviceList, PrintRaw, DisConnect} = require('./build/Release/addon.node');
     return {
       GetUsbDeviceList () {
         return GetDeviceList('USB');
@@ -19,6 +19,9 @@ const win32Escpos = function () {
           item.path = path;
           return item;
         });
+      },
+      DisConnect (path) {
+        return DisConnect(path);
       },
       GetDeviceList,
       PrintRaw 

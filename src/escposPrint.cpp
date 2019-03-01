@@ -1,6 +1,15 @@
 #include "escposPrint.h"
+#include <windows.h>
+#include <map>
 using namespace std;
 
+typedef struct HInfo {
+	BOOL isInit;
+	HANDLE handle;
+} HandlerInfo;
+typedef pair <string, HandlerInfo> HandlerInfo_Pair;
+
+map<string, HandlerInfo> handlerMap;
 //USB类的GUID
 const GUID USB_GUID = { 0xa5dcbf10, 0x6530, 0x11d2,{ 0x90, 0x1f, 0x00, 0xc0, 0x4f, 0xb9, 0x51, 0xed } };
 BOOL PrintRawDataByLpt(string devicePath, char*  meg, size_t size, PrintResult *result)
@@ -28,27 +37,59 @@ BOOL PrintRawDataByLpt(string devicePath, char*  meg, size_t size, PrintResult *
 	SetPrintResult(result, TRUE, NULL);
 	return TRUE;
 }
+BOOL DisConnectDevice(string devicePath) {
+	HANDLE handle;
+	HandlerInfo handlerInfo = HandlerInfo();
+	if ((handlerMap.size()) ==  0) {
+		return FALSE;
+	}
+	handlerInfo = handlerMap[devicePath];
+	if (handlerInfo.isInit) {
+	  BOOL	ret =  CloseHandle(handlerInfo.handle);
+	  handlerInfo.isInit = !ret;
+	  handlerMap.erase(devicePath);
+	  return ret;
+	}
+	return FALSE;
+}
+
 BOOL PrintRawData(string devicePath, char*  meg, size_t size, PrintResult *result)
 {
 	// string endstr = "\x1D\x56\x41\x00";
 	PrintDevice device;
+	HANDLE handle;
 	InitializeDevicePar(device);
 	device.Port = devicePath;
-	HANDLE handle = InitPort(device);
+	HandlerInfo handlerInfo = HandlerInfo();
+	if ((handlerMap.size())>  0) {
+	
+		handlerInfo = handlerMap[(devicePath)];
+	}
+	if (  handlerInfo.isInit == FALSE) {
+		handlerInfo =  HandlerInfo();
+		// free(handle);
+		handle = InitPort(device);
+		handlerInfo.handle = handle;
+		handlerInfo.isInit = TRUE;
+		handlerMap.insert(HandlerInfo_Pair(devicePath, handlerInfo));
+		// handlerMap.insert(device, handlerInfo);
+	}
+	
 
-	BOOL r = WriteRawData(meg, handle, size);
+	BOOL r = WriteRawData(meg, handlerInfo.handle, size);
 	if (!r)
 	{
 		SetPrintResult(result, FALSE, GetLastError());
-		CloseHandle(handle);
-
+		CloseHandle(handlerInfo.handle);
+		handlerInfo.isInit = FALSE;
 		return FALSE;
 	}
 	printf("write file result is %d", r);
 	int err = GetLastError();
 	printf("getlast err is %d", err);
-	CloseHandle(handle);
+	// CloseHandle(handle);
 	SetPrintResult(result, TRUE, err);
+	// Sleep(2000);
 	return TRUE;
 }
 
@@ -128,13 +169,13 @@ HANDLE InitPort(PrintDevice &device)
 		DWORD iBytesLength;
 		const char* chInitCode = "\x0D\x1B\x40";
 		WriteFile(handle, chInitCode, (DWORD)3L, &iBytesLength, NULL);
+		
 		if (!WriteFile(handle, chInitCode, (DWORD)3L, &iBytesLength, NULL))
 		{
 			cout << "last err is " << GetLastError() << endl;
 			return FALSE;
 
 		}
-
 	}
 
 	return handle;

@@ -36,6 +36,8 @@ struct PrintResult
 #define MAX_DEVICE 16
 BOOL PrintRawDataByLpt(string devicePath, char*  meg, size_t size, PrintResult *result);
 BOOL PrintRawData(string devicePath, char*  meg, size_t size, PrintResult *result);
+BOOL DisConnectDevice(string devicePath);
+
 int WriteRawData(const char * str, HANDLE hPort, size_t size);
 HANDLE InitPort(PrintDevice &device);
 void InitializeDevicePar(PrintDevice &device);

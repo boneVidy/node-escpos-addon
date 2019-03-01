@@ -142,17 +142,41 @@ void GetDeviceList(const FunctionCallbackInfo<Value>& args)
 	args.GetReturnValue().Set(resultArr);
 
 }
-void parseFromV8String(v8::Local<v8::String> &deviceType, char* deviceTypeBuffer, bool &retflag)
+BOOL parseFromV8String(v8::Local<v8::String> &v8String, char* charBuffer)
 {
-	retflag = true;
-	int len = deviceType->Utf8Length();
-	deviceTypeBuffer = (char *)malloc(len + 1);
-	if (deviceTypeBuffer == nullptr) {
+	int len = v8String->Utf8Length();
+	charBuffer = (char *)malloc(len + 1);
+	if (charBuffer == nullptr) {
+		return FALSE;
+	}
+	v8String->WriteUtf8(charBuffer, len);
+	charBuffer[v8String->Utf8Length()] = 0;
+	return TRUE;
+}
+void DisConnect(const FunctionCallbackInfo<Value>& args) {
+	Isolate* isolate = args.GetIsolate();
+	if (args.Length() < 1)
+	{
+		isolate->ThrowException(Exception::Error(String::NewFromUtf8(isolate, "pls call thisFunction like this DisconnectDevice(devicePath: string)")));
 		return;
 	}
-	deviceType->WriteUtf8(deviceTypeBuffer, len);
-	deviceTypeBuffer[deviceType->Utf8Length()] = 0;
-	retflag = false;
+	if (!args[0]->IsString())
+	{
+		isolate->ThrowException(Exception::TypeError(String::NewFromUtf8(isolate, "the argument must be a string")));
+		return;
+	}
+	Local<String> devicePath = args[0]->ToString();
+	const int len = devicePath->Utf8Length();
+
+	char* devicePathBf = (char *)malloc(len + 1);
+	if (nullptr == devicePathBf) 
+	{
+		return;
+	}
+	devicePath->WriteUtf8(devicePathBf, len);
+	devicePathBf[len] = 0;
+	BOOL disconnectResult = DisConnectDevice(devicePathBf);
+	args.GetReturnValue().Set(Boolean::New(isolate, disconnectResult));
 }
 void PrintRaw(const FunctionCallbackInfo<Value>& args)
 {
@@ -208,6 +232,7 @@ void Initialize(Local<Object> exports) {
 	// NODE_SET_METHOD(exports, "Print", Print);
 	NODE_SET_METHOD(exports, "GetDeviceList", GetDeviceList);
 	NODE_SET_METHOD(exports, "PrintRaw", PrintRaw);
+	NODE_SET_METHOD(exports, "DisConnect", DisConnect);
 }
 
 

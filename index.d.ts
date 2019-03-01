@@ -14,6 +14,8 @@ export function GetUsbDeviceList (): EscposPrinter[];
 export function GetLptDeviceList(): EscposPrinter[];
 export function GetComDeviceList(): EscposPrinter[];
 export function GetDeviceList(type?:DeviceType): EscposPrinter[];
+export function DisConnect(path:string): boolean;
+
 /**
  * 
  * @param {string} path 
