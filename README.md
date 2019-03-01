@@ -19,5 +19,8 @@ const lptList = escpos.GetLptDeviceList();
 const printer = lptList[0];
 const content = iconv.encode("你好啊\n halo cpp!\\n\n\n\n\nn\n\n\n\n", 'GB18030');
 const {success, err} = escpos.PrintRaw(printer.path, content);
+
+// disconnect
 const isDisConnected = escpos.Disconnect(printer.path);
+
 ```
