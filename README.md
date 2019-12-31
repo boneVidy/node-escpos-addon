@@ -1,3 +1,5 @@
+#install for electron
+```npm i clipboard-files --build-from-source --runtime=electron --target=7.1.2 --target-arch=ia32 --dist-url=https://atom.io/download/electron```
 #escpos native plugin for electron
 #目前只支持 windows系统
 ```js
