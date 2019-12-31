@@ -1,6 +1,6 @@
 ---
 ```
-npm i clipboard-files --build-from-source --runtime=electron --target=7.1.2 --target-arch=ia32 --dist-url=https://atom.io/download/electron
+npm i node-escpos-addon --build-from-source --runtime=electron --target=7.1.2 --target-arch=ia32 --dist-url=https://atom.io/download/electron
 ```
 ---
 #escpos native plugin for electron
