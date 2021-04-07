@@ -4,6 +4,8 @@ npm i node-escpos-addon --build-from-source --runtime=electron --target=7.1.2 --
 ```
 ---
 #escpos native plugin for electron
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FboneVidy%2Fnode-escpos-addon.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FboneVidy%2Fnode-escpos-addon?ref=badge_shield)
+
 #目前只支持 windows系统
 ```js
 // usb printer
@@ -30,3 +32,7 @@ const {success, err} = escpos.PrintRaw(printer.path, content);
 const isDisConnected = escpos.Disconnect(printer.path);
 
 ```
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FboneVidy%2Fnode-escpos-addon.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FboneVidy%2Fnode-escpos-addon?ref=badge_large)
